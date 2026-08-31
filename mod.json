@@ -1,0 +1,30 @@
+{
+    "geode": "3.0.0",
+    "gd": {
+        "win": "2.2074",
+        "android": "2.2074",
+        "mac": "2.2074",
+        "ios": "2.2074"
+    },
+    "version": "v1.0.0",
+    "id": "yallcode.statscard",
+    "name": "Level Complete Stats Card",
+    "developer": "YallCode",
+    "description": "Shows a shareable stats card after beating a level — attempts, time spent, grade, and date. Vibemodded.",
+    "repository": "https://github.com/YallCode/StatsCard",
+    "tags": ["gameplay", "utility", "interface"],
+    "settings": {
+        "show-stats-card": {
+            "type": "bool",
+            "default": true,
+            "name": "Show Stats Card",
+            "description": "Show a stats card popup after completing a level."
+        },
+        "auto-save-image": {
+            "type": "bool",
+            "default": false,
+            "name": "Auto-save Image",
+            "description": "Automatically save the card as a PNG every time it appears, no button press needed."
+        }
+    }
+}
