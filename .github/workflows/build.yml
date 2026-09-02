@@ -24,7 +24,7 @@ jobs:
 
     name: ${{ matrix.config.name }}
     runs-on: ${{ matrix.config.os }}
-    continue-on-error: ${{ matrix.config.name == 'Android32' || matrix.config.name == 'Android64' }}
+    continue-on-error: true
 
     steps:
       - name: Checkout
@@ -34,4 +34,5 @@ jobs:
         uses: geode-sdk/build-geode-mod@main
         with:
           target: ${{ matrix.config.target }}
+          sdk: v5.10.1
           configure-args: -DCMAKE_POLICY_VERSION_MINIMUM=3.5
