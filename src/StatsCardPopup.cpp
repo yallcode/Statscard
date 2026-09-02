@@ -1,5 +1,4 @@
 #include "StatsCardPopup.hpp"
-#include <Geode/utils/file.hpp>
 #include <ctime>
 #include <sstream>
 #include <iomanip>
@@ -8,7 +7,7 @@ using namespace geode::prelude;
 
 StatsCardPopup* StatsCardPopup::create(LevelStats const& stats) {
     auto ret = new StatsCardPopup();
-    if (ret->initAnchored(280.f, 190.f, stats)) {
+    if (ret->init(stats)) {
         ret->autorelease();
         return ret;
     }
@@ -16,7 +15,11 @@ StatsCardPopup* StatsCardPopup::create(LevelStats const& stats) {
     return nullptr;
 }
 
-bool StatsCardPopup::setup(LevelStats const& stats) {
+bool StatsCardPopup::init(LevelStats const& stats) {
+    if (!Popup::init(280.f, 190.f)) {
+        return false;
+    }
+
     m_stats = stats;
     this->setTitle("Level Complete!");
 
@@ -26,7 +29,6 @@ bool StatsCardPopup::setup(LevelStats const& stats) {
 
     this->buildCard();
 
-    // Save-as-image button, bottom of the popup
     auto saveSpr = ButtonSprite::create("Save Image", "goldFont.fnt", "GJ_button_01.png", 0.8f);
     auto saveBtn = CCMenuItemSpriteExtra::create(
         saveSpr, this, menu_selector(StatsCardPopup::onSaveImage)
@@ -47,7 +49,6 @@ void StatsCardPopup::buildCard() {
     float cardWidth = 240.f;
     float y = 60.f;
 
-    // Level name
     auto nameLabel = CCLabelBMFont::create(m_stats.levelName.c_str(), "bigFont.fnt");
     nameLabel->setScale(0.55f);
     nameLabel->setPosition({ 0.f, y });
@@ -57,7 +58,6 @@ void StatsCardPopup::buildCard() {
     m_cardLayer->addChild(nameLabel);
     y -= 22.f;
 
-    // Creator
     auto creatorStr = "by " + (m_stats.creatorName.empty() ? std::string("-") : m_stats.creatorName);
     auto creatorLabel = CCLabelBMFont::create(creatorStr.c_str(), "chatFont.fnt");
     creatorLabel->setScale(0.5f);
@@ -66,7 +66,6 @@ void StatsCardPopup::buildCard() {
     m_cardLayer->addChild(creatorLabel);
     y -= 26.f;
 
-    // Stats rows: attempts | time | grade
     auto attemptsLabel = CCLabelBMFont::create(
         (std::to_string(m_stats.attempts) + " attempts").c_str(), "chatFont.fnt"
     );
@@ -87,14 +86,12 @@ void StatsCardPopup::buildCard() {
     m_cardLayer->addChild(gradeLabel);
     y -= 26.f;
 
-    // Date
     auto dateLabel = CCLabelBMFont::create(formatDate().c_str(), "chatFont.fnt");
     dateLabel->setScale(0.45f);
     dateLabel->setPosition({ 0.f, y });
     dateLabel->setColor({ 150, 150, 150 });
     m_cardLayer->addChild(dateLabel);
 
-    // Vibemodded watermark, bottom-right corner of the card
     auto watermark = CCLabelBMFont::create("vibemodded", "chatFont.fnt");
     watermark->setScale(0.35f);
     watermark->setAnchorPoint({ 1.f, 0.f });
@@ -105,9 +102,6 @@ void StatsCardPopup::buildCard() {
 }
 
 void StatsCardPopup::onSaveImage(CCObject*) {
-    // Renders m_cardLayer to a texture and writes it to disk as a PNG.
-    // NOTE: exact CCRenderTexture / saveToFile signatures can drift between
-    // cocos2d-x forks — double check against the version Geode vendors.
     auto size = CCSizeMake(320.f, 220.f);
     auto rt = CCRenderTexture::create((int)size.width, (int)size.height);
 
@@ -128,7 +122,7 @@ void StatsCardPopup::onSaveImage(CCObject*) {
     filename << "card_" << std::time(nullptr) << ".png";
     auto path = saveDir / filename.str();
 
-    rt->saveToFile(path.string().c_str(), tImageFormat::kCCImageFormatPNG);
+    rt->saveToFile(path.string().c_str(), cocos2d::kCCImageFormatPNG);
 
     Notification::create("Saved to " + path.string(), NotificationIcon::Success)->show();
 }
